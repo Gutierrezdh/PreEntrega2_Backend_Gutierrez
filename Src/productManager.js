@@ -3,7 +3,6 @@ const ProductModel = require('./models/products.model');
 
 class ProductManager {
     constructor() {
-        // No necesitas la constante PRODUCTS_FILE en este contexto
         this.products = [];
         this.productIdCounter = 1;
     }
@@ -12,8 +11,7 @@ class ProductManager {
         const { id, title, description, price, code, stock, thumbnails } = product;
     
         try {
-            console.log('Datos del producto recibidos:', product);
-    
+            console.log('Datos del producto recibidos:', product);    
             // Verificar si ya existe un producto con el mismo código
             const codeExists = await ProductModel.exists({ code });
             if (codeExists) {
@@ -21,7 +19,6 @@ class ProductManager {
                 return;
             }
     
-            // Crear el nuevo producto utilizando el modelo de Mongoose
             const newProduct = await ProductModel.create({
                 id,
                 title,
@@ -43,7 +40,6 @@ class ProductManager {
 
     async getProducts() {
         try {
-            // Obtener todos los productos utilizando el modelo de Mongoose
             const products = await ProductModel.find();
             return products;
         } catch (error) {
@@ -53,7 +49,6 @@ class ProductManager {
 
     async getProductById(id) {
         try {
-            // Obtener un producto por su ID utilizando el modelo de Mongoose
             const productId = mongoose.Types.ObjectId(id);
             const product = await ProductModel.findById(productId);
             return product;
@@ -68,7 +63,7 @@ class ProductManager {
             console.log('ID recibido:', id);
             console.log('Campos actualizados recibidos:', updatedFields);
     
-            const filter = { id: id }; // Usar 'id' en lugar de '_id'
+            const filter = { id: id }; 
             const update = { $set: updatedFields };
             const options = { new: true, useFindAndModify: false };
     
@@ -97,11 +92,11 @@ class ProductManager {
                 return result;
             } else {
                 console.error('No se encontró un producto con el ID proporcionado.');
-                return null; // Otra opción es lanzar un error si prefieres manejarlo de esa manera
+                return null; 
             }
         } catch (error) {
             console.error('Error al eliminar el producto:', error);
-            throw error; // Puedes manejar el error de acuerdo a tus necesidades
+            throw error; 
         }
     }
 }
