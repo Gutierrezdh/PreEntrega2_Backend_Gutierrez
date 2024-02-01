@@ -2,21 +2,63 @@ const express = require('express');
 const router = express.Router();
 const ProductManager = require('../productManager');
 const { socketServer } = require('../app');
+const mongoose = require('mongoose');
 const productManager = new ProductManager();
 
+// Obtener todos los productos
 router.get('/', async (req, res) => {
     try {
-        const limit = req.query.limit;
-        let productsToSend = await productManager.getProducts();
-        if (limit) {
-            productsToSend = productsToSend.slice(0, parseInt(limit));
+        const { limit = 10, page = 1, query, sort } = req.query;
+
+        // Construye el objeto de opciones para la paginación
+        const options = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+        };
+
+        // Construye el objeto de opciones para la búsqueda
+        const searchOptions = {};
+
+        if (query) {
+            // Búsqueda por nombre o descripción (insensible a mayúsculas y minúsculas)
+            searchOptions.$or = [
+                { title: { $regex: new RegExp(query, 'i') } },
+                { description: { $regex: new RegExp(query, 'i') } }
+            ];
         }
-        res.json(productsToSend);
+
+        // Realiza la búsqueda y paginación usando mongoosePaginate
+        const result = await productManager.getProductsPaginated(searchOptions, options);
+
+        // Ordena los resultados si se proporciona el parámetro de ordenamiento
+        if (sort === 'asc') {
+            result.docs = result.docs.sort((a, b) => a.price - b.price);
+        } else if (sort === 'desc') {
+            result.docs = result.docs.sort((a, b) => b.price - a.price);
+        }
+
+        const response = {
+            status: 'success',
+            payload: result.docs,
+            totalPages: result.totalPages,
+            prevPage: result.prevPage,
+            nextPage: result.nextPage,
+            page: result.page,
+            hasPrevPage: result.hasPrevPage,
+            hasNextPage: result.hasNextPage,
+            prevLink: result.hasPrevPage ? `/products?page=${result.prevPage}&limit=${limit}&sort=${sort}&query=${query}` : null,
+            nextLink: result.hasNextPage ? `/products?page=${result.nextPage}&limit=${limit}&sort=${sort}&query=${query}` : null
+        };
+
+        res.json(response);
     } catch (error) {
         console.error('Error al obtener productos:', error);
-        res.status(500).send('Error interno del servidor');
+        res.status(500).json({ status: 'error', payload: 'Error interno del servidor' });
     }
 });
+
+
+
 
 router.get('/:pid', async (req, res) => {
     try {

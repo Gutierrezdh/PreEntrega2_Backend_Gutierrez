@@ -7,13 +7,24 @@ router.get('/', (req, res) => {
   res.render('home', { title: 'Página de Inicio' });
 });
 
+// Vista para mostrar todos los productos con paginación
 router.get('/products', async (req, res) => {
   try {
-    const products = await productManager.getProducts();
-    res.render('home', {
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+
+    const allProducts = await productManager.getProducts();
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const products = allProducts.slice(startIndex, endIndex);
+
+    res.render('products', {
       title: 'Listado de productos',
-      products: products,
-      style: "css/products.css",
+      products,
+      currentPage: page,
+      totalPages: Math.ceil(allProducts.length / limit),
+      style: 'css/products.css',
     });
   } catch (error) {
     console.error(error);
@@ -27,11 +38,31 @@ router.get('/realtimeproducts', async (req, res) => {
     res.render('realTimeProducts', {
       title: 'Productos en tiempo real',
       products: products,
-      style: "css/products.css",
     });
   } catch (error) {
     console.error(error);
     res.status(500).send('Error al obtener los productos en tiempo real');
+  }
+});
+
+// Nueva vista para visualizar un carrito específico
+router.get('/carts/:cid', async (req, res) => {
+  try {
+    const cartId = req.params.cid;
+    const cart = await cartManager.getCartById(cartId);
+
+    if (cart) {
+      // Renderizar la vista del carrito con los productos asociados
+      res.render('cartDetails', {
+        title: `Carrito ${cartId}`,
+        cart,
+      });
+    } else {
+      res.status(404).send('Carrito no encontrado');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al obtener el carrito');
   }
 });
 

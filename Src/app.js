@@ -2,6 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const http = require('http');
 const socketIO = require('socket.io');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const fileStore = require('session-file-store');
 const productsRouter = require('./routes/products');
 const cartsRouter = require('./routes/carts');
 const handlebars = require('express-handlebars');
@@ -9,12 +12,37 @@ const path = require('path');
 const viewsRouter = require('./routes/views.route.js');
 const { dirName } = require('./utils.js');
 const ProductManager = require('./productManager');
+const MongoStore = require('connect-mongo');
+const loginRouter = require('./routes/login.routes.js');
+const signupRouter = require('./routes/signup.routes.js');
+const sessionRouter = require('./routes/session.routes.js');
 
+
+const fileStorage = fileStore(session);
 const app = express();
 const PORT = 8080;
 const server = http.createServer(app);
 const socketServer = socketIO(server);
 const productManager = new ProductManager();
+app.use(cookieParser());
+app.use(session({
+    store:MongoStore.create({
+        mongoUrl: 'mongodb+srv://CoderUser:1234@cluster0.vllinqm.mongodb.net/coder?retryWrites=true&w=majority',
+        mongoOptions: { useNewUrlParser: true },
+        ttl:600,
+}),
+    secret: 'coderhouse',
+    resave: false,
+    saveUninitialized: false,
+}))
+
+const enviroment = async() => {
+    try {
+        await mongoose.connect('mongodb+srv://CoderUser:1234@cluster0.vllinqm.mongodb.net/coder?retryWrites=true&w=majority');
+    } catch (error) {
+        console.log(error);
+    }
+};
 
 // Conexión a MongoDB Atlas
 mongoose.connect('mongodb+srv://CoderUser:1234@cluster0.vllinqm.mongodb.net/coder?retryWrites=true&w=majority', {
@@ -28,9 +56,6 @@ db.once('open', () => {
     console.log('Conectado a MongoDB Atlas');
 });
 
-// Resto del código sin modelos específicos
-
-// Middleware para manejar JSON en las solicitudes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -44,6 +69,12 @@ app.set('view engine', 'handlebars');
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 app.use('/', viewsRouter);
+
+//Login routes
+app.use('/', sessionRouter);
+app.use('/login', loginRouter);
+app.use('/signup', signupRouter);
+
 
 socketServer.on('connection', (socket) => {
     socket.on('addProduct', async (product) => {
