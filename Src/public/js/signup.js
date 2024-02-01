@@ -32,7 +32,7 @@ async function postSignup(first_name, last_name, email, password, age) {
         return result;
     } catch (error) {
         console.error("Error al enviar la solicitud:", error);
-        throw error; // Re-lanza el error para que pueda ser manejado en el código que llama a esta función
+        throw error; 
     }
 }
 
@@ -60,7 +60,6 @@ signupForm.addEventListener("submit", async (event) => {
             alert("Datos incorrectos");
         }
     } catch (error) {
-        // Aquí puedes manejar el error de manera adecuada, por ejemplo, mostrando un mensaje al usuario
         console.error("Error durante el proceso de registro:", error);
     }
 });

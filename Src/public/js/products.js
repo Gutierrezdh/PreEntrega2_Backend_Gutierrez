@@ -33,7 +33,6 @@ addProductBtn.addEventListener("click", () => {
   alert("Producto agregado correctamente");
 });
 socket.on("updateProducts", (products) => {
-    // Recargo la página para reflejar los cambios
     window.location.reload();
   });
 }
@@ -48,7 +47,6 @@ deleteProductBtn.addEventListener("click", () => {
 });
 
 socket.on("updateProducts", (products) => {
-  // Recargo la página para reflejar los cambios
   window.location.reload();
 });
 }

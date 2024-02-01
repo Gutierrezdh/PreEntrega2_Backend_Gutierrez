@@ -11,7 +11,7 @@ router.post('/login', async  (req, res) => {
         res.status(400).json({ error: 'Credenciales incorrectas' });
     } else {
         req.session.user = email;
-        // req.session.role = result.role || 'user';
+        req.session.role = result.role || 'user';
         res.status(200).json({ message: 'ok' });
     }
 })

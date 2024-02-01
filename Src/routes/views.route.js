@@ -7,7 +7,6 @@ router.get('/', (req, res) => {
   res.render('home', { title: 'Página de Inicio' });
 });
 
-// Vista para mostrar todos los productos con paginación
 router.get('/products', async (req, res) => {
   try {
     const page = req.query.page || 1;
@@ -45,14 +44,12 @@ router.get('/realtimeproducts', async (req, res) => {
   }
 });
 
-// Nueva vista para visualizar un carrito específico
 router.get('/carts/:cid', async (req, res) => {
   try {
     const cartId = req.params.cid;
     const cart = await cartManager.getCartById(cartId);
 
     if (cart) {
-      // Renderizar la vista del carrito con los productos asociados
       res.render('cartDetails', {
         title: `Carrito ${cartId}`,
         cart,
