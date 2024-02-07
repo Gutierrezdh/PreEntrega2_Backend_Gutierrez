@@ -1,5 +1,7 @@
 const fs = require('fs');
 const { dirname: pathDirname, join } = require('path');
+const bcrypt = require('bcrypt');
+
 
 const filename = __filename;
 const dirName = pathDirname(filename);
@@ -23,7 +25,7 @@ async function writeFile(file, data) {
   } catch (err) {
     console.log(err);
   }
-}
+};
 
 async function deleteFile(file) {
   try {
@@ -32,6 +34,17 @@ async function deleteFile(file) {
   } catch (err) {
     console.log(err);
   }
-}
+};
 
-module.exports = { readFile, writeFile, deleteFile, filename, dirName };
+const createHash = (password) => {
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+};
+
+const isValidPassword = (savedPassword, password) => {
+  console.log(savedPassword);
+  console.log(bcrypt.hashSync(password, bcrypt.genSaltSync(10)));
+
+  return bcrypt.compareSync(password, savedPassword);
+};
+
+module.exports = { createHash, isValidPassword, readFile, writeFile, deleteFile, filename, dirName };

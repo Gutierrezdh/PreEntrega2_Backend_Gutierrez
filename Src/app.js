@@ -1,4 +1,6 @@
 const express = require('express');
+const passport = require('passport');
+const initializePassport = require('./config/passport.config.js');
 const mongoose = require('mongoose');
 const http = require('http');
 const socketIO = require('socket.io');
@@ -16,6 +18,12 @@ const MongoStore = require('connect-mongo');
 const loginRouter = require('./routes/login.routes.js');
 const signupRouter = require('./routes/signup.routes.js');
 const sessionRouter = require('./routes/session.routes.js');
+const dotenv = require('dotenv');
+const COOKIESECRET = process.env.COOKIESECRET;
+
+dotenv.config();
+
+
 
 
 const fileStorage = fileStore(session);
@@ -25,16 +33,17 @@ const server = http.createServer(app);
 const socketServer = socketIO(server);
 const productManager = new ProductManager();
 app.use(cookieParser());
-app.use(session({
-    store:MongoStore.create({
-        mongoUrl: 'mongodb+srv://CoderUser:1234@cluster0.vllinqm.mongodb.net/coder?retryWrites=true&w=majority',
-        mongoOptions: { useNewUrlParser: true },
-        ttl:600,
-}),
-    secret: 'coderhouse',
-    resave: false,
-    saveUninitialized: false,
-}))
+
+// app.use(session({
+//     store:MongoStore.create({
+//         mongoUrl: 'mongodb+srv://CoderUser:1234@cluster0.vllinqm.mongodb.net/coder?retryWrites=true&w=majority',
+//         mongoOptions: { useNewUrlParser: true },
+//         ttl:600,
+// }),
+//     secret: 'coderhouse',
+//     resave: false,
+//     saveUninitialized: false,
+// }))
 
 const enviroment = async() => {
     try {
@@ -64,6 +73,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.engine('handlebars', handlebars.create({ defaultLayout: 'main' }).engine);
 app.set('views', path.join(dirName, 'views'));
 app.set('view engine', 'handlebars');
+
+initializePassport();
+app.use(
+    session({
+    secret: COOKIESECRET,
+    resave: false,
+    saveUninitialized: true,
+    })
+);
+app.use(passport.initialize());
 
 // Rutas de API
 app.use('/api/products', productsRouter);

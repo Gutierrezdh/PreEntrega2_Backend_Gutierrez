@@ -7,6 +7,10 @@ router.get('/', (req, res) => {
   res.render('home', { title: 'Página de Inicio' });
 });
 
+router.get("/login", (req, res) => {
+  res.render("login");
+});
+
 router.get('/products', async (req, res) => {
   try {
     const page = req.query.page || 1;
