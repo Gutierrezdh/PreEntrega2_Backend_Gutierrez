@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const CartModel = require('./models/carts.model');
+const CartModel = require('./dao/models/carts.model');
 
 class CartManager {
     constructor() {

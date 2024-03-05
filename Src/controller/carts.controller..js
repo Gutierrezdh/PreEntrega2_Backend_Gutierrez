@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Cart = require('../models/carts.model');
-const Product = require('../models/products.model');
+const Cart = require('../dao/models/carts.model');  // Reemplaza con la ruta correcta a tu modelo Cart
+const Product = require('../dao/models/products.model');  // Reemplaza con la ruta correcta a tu modelo Product
 
-router.post('/', async (req, res) => {
+const createCart = async (req, res) => {
     try {
         const newCart = await Cart.create({ products: [] });
         res.status(201).json({ status: 'success', payload: newCart });
@@ -11,9 +11,9 @@ router.post('/', async (req, res) => {
         console.error('Error al crear el carrito:', error);
         res.status(500).json({ status: 'error', payload: 'Error interno del servidor' });
     }
-});
+};
 
-router.get('/:cid', async (req, res) => {
+const getCartById = async (req, res) => {
     try {
         const cartId = req.params.cid;
         const cart = await Cart.findById(cartId).populate('products.product');
@@ -26,9 +26,9 @@ router.get('/:cid', async (req, res) => {
         console.error('Error al obtener el carrito por ID:', error);
         res.status(500).json({ status: 'error', payload: 'Error interno del servidor' });
     }
-});
+};
 
-router.post('/:cid/products/:pid', async (req, res) => {
+const addProductToCart = async (req, res) => {
     try {
         const cartId = req.params.cid;
         const productId = req.params.pid;
@@ -57,9 +57,9 @@ router.post('/:cid/products/:pid', async (req, res) => {
         console.error('Error al agregar producto al carrito:', error);
         res.status(500).json({ status: 'error', payload: 'Error interno del servidor' });
     }
-});
+};
 
-router.delete('/:cid/products/:pid', async (req, res) => {
+const removeProductFromCart = async (req, res) => {
     try {
         const cartId = req.params.cid;
         const productId = req.params.pid;
@@ -77,9 +77,9 @@ router.delete('/:cid/products/:pid', async (req, res) => {
         console.error('Error al eliminar producto del carrito:', error);
         res.status(500).json({ status: 'error', payload: 'Error interno del servidor' });
     }
-});
+};
 
-router.put('/:cid', async (req, res) => {
+const updateCart = async (req, res) => {
     try {
         const cartId = req.params.cid;
         const updatedProducts = req.body.products || [];
@@ -90,9 +90,9 @@ router.put('/:cid', async (req, res) => {
         console.error('Error al actualizar el carrito:', error);
         res.status(500).json({ status: 'error', payload: 'Error interno del servidor' });
     }
-});
+};
 
-router.put('/:cid/products/:pid', async (req, res) => {
+const updateProductQuantityInCart = async (req, res) => {
     try {
         const cartId = req.params.cid;
         const productId = req.params.pid;
@@ -109,9 +109,9 @@ router.put('/:cid/products/:pid', async (req, res) => {
         console.error('Error al actualizar la cantidad del producto en el carrito:', error);
         res.status(500).json({ status: 'error', payload: 'Error interno del servidor' });
     }
-});
+};
 
-router.delete('/:cid', async (req, res) => {
+const clearCart = async (req, res) => {
     try {
         const cartId = req.params.cid;
         const cart = await Cart.findByIdAndUpdate(cartId, { products: [] }, { new: true });
@@ -120,6 +120,22 @@ router.delete('/:cid', async (req, res) => {
         console.error('Error al vaciar el carrito:', error);
         res.status(500).json({ status: 'error', payload: 'Error interno del servidor' });
     }
-});
+};
 
-module.exports = router;
+router.post('/', createCart);
+router.get('/:cid', getCartById);
+router.post('/:cid/products/:pid', addProductToCart);
+router.delete('/:cid/products/:pid', removeProductFromCart);
+router.put('/:cid', updateCart);
+router.put('/:cid/products/:pid', updateProductQuantityInCart);
+router.delete('/:cid', clearCart);
+
+module.exports = {
+    createCart,
+    getCartById,
+    addProductToCart,
+    removeProductFromCart,
+    updateCart,
+    updateProductQuantityInCart,
+    clearCart
+};

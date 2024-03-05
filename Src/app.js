@@ -7,24 +7,21 @@ const socketIO = require('socket.io');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const fileStore = require('session-file-store');
-const productsRouter = require('./routes/products');
-const cartsRouter = require('./routes/carts');
+const productsRouter = require('./dao/routes/products.js');
+const cartsRouter = require('./dao/routes/carts');
 const handlebars = require('express-handlebars');
 const path = require('path');
-const viewsRouter = require('./routes/views.route.js');
+const viewsRouter = require('./dao/routes/views.route.js');
 const { dirName } = require('./utils.js');
 const ProductManager = require('./productManager');
 const MongoStore = require('connect-mongo');
-const loginRouter = require('./routes/login.routes.js');
-const signupRouter = require('./routes/signup.routes.js');
-const sessionRouter = require('./routes/session.routes.js');
+const loginRouter = require('./dao/routes/login.routes.js');
+const signupRouter = require('./dao/routes/signup.routes.js');
+const sessionRouter = require('./dao/routes/session.routes.js');
 const dotenv = require('dotenv');
 const COOKIESECRET = process.env.COOKIESECRET;
 
 dotenv.config();
-
-
-
 
 const fileStorage = fileStore(session);
 const app = express();
@@ -33,17 +30,6 @@ const server = http.createServer(app);
 const socketServer = socketIO(server);
 const productManager = new ProductManager();
 app.use(cookieParser());
-
-// app.use(session({
-//     store:MongoStore.create({
-//         mongoUrl: 'mongodb+srv://CoderUser:1234@cluster0.vllinqm.mongodb.net/coder?retryWrites=true&w=majority',
-//         mongoOptions: { useNewUrlParser: true },
-//         ttl:600,
-// }),
-//     secret: 'coderhouse',
-//     resave: false,
-//     saveUninitialized: false,
-// }))
 
 const enviroment = async() => {
     try {

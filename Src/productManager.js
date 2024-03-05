@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const ProductModel = require('./models/products.model');
+const ProductModel = require('./dao/models/products.model');
 
 class ProductManager {
     constructor() {

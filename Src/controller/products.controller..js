@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const productManager = new ProductManager();
 
 // Obtener todos los productos
-router.get('/', async (req, res) => {
+async function getProducts(req, res) {
     try {
         const { limit = 10, page = 1, query, sort } = req.query;
 
@@ -55,12 +55,9 @@ router.get('/', async (req, res) => {
         console.error('Error al obtener productos:', error);
         res.status(500).json({ status: 'error', payload: 'Error interno del servidor' });
     }
-});
+}
 
-
-
-
-router.get('/:pid', async (req, res) => {
+async function getProductById(req, res) {
     try {
         const productId = parseInt(req.params.pid);
         const product = await productManager.getProductById(productId);
@@ -73,9 +70,9 @@ router.get('/:pid', async (req, res) => {
         console.error('Error al obtener producto por ID:', error);
         res.status(500).send('Error interno del servidor');
     }
-});
+}
 
-router.post('/', async (req, res) => {
+async function addProduct(req, res) {
     try {
         const newProduct = req.body;
         const result = await productManager.addProduct(newProduct);
@@ -87,9 +84,9 @@ router.post('/', async (req, res) => {
         console.error('Error al agregar producto:', error);
         res.status(500).send('Error interno del servidor');
     }
-});
+}
 
-router.put('/:pid', async (req, res) => {
+async function updateProduct(req, res) {
     try {
         const productId = parseInt(req.params.pid);
         const updatedFields = req.body;
@@ -103,9 +100,9 @@ router.put('/:pid', async (req, res) => {
         console.error('Error al actualizar producto:', error);
         res.status(500).send('Error interno del servidor');
     }
-});
+}
 
-router.delete('/:pid', async (req, res) => {
+async function deleteProduct(req, res) {
     try {
         const productId = parseInt(req.params.pid);
         const result = await productManager.deleteProduct(productId);
@@ -117,6 +114,12 @@ router.delete('/:pid', async (req, res) => {
         console.error('Error al eliminar producto:', error);
         res.status(500).send('Error interno del servidor');
     }
-});
+}
 
-module.exports = router;
+module.exports = {
+    getProducts,
+    getProductById,
+    addProduct,
+    updateProduct,
+    deleteProduct
+};
