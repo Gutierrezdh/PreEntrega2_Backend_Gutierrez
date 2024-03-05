@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Cart = require('../dao/models/carts.model');  // Reemplaza con la ruta correcta a tu modelo Cart
-const Product = require('../dao/models/products.model');  // Reemplaza con la ruta correcta a tu modelo Product
+const Cart = require('../dao/models/carts.model');  
+const Product = require('../dao/models/products.model');  
 
 const createCart = async (req, res) => {
     try {
